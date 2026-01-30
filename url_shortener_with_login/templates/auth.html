@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Shortener - Login & Signup</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --secondary-color: #10b981;
+            --danger-color: #ef4444;
+            --dark-color: #1f2937;
+            --light-color: #f3f4f6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #8b5cf6 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+        }
+
+        .auth-container {
+            max-width: 450px;
+            width: 100%;
+        }
+
+        .card {
+            background: white;
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #8b5cf6 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .card-header h1 {
+            margin: 0;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .card-header p {
+            margin: 0;
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        .card-body {
+            padding: 40px;
+        }
+
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 8px;
+            display: block;
+            font-size: 0.95rem;
+        }
+
+        .form-control {
+            border: 2px solid var(--light-color);
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background-color: var(--light-color);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            background-color: white;
+            outline: none;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #8b5cf6 100%);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            width: 100%;
+            color: white;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .toggle-section {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--light-color);
+        }
+
+        .toggle-section p {
+            margin: 0;
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .toggle-link {
+            color: var(--primary-color);
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .toggle-link:hover {
+            color: #8b5cf6;
+            text-decoration: underline;
+        }
+
+        /* Alert Messages */
+        .alert {
+            border-radius: 10px;
+            border: none;
+            margin-bottom: 20px;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-success {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .alert-danger {
+            background-color: #fee2e2;
+            color: #7f1d1d;
+        }
+
+        .alert-info {
+            background-color: #dbeafe;
+            color: #0c2d6b;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: none;
+            margin-right: 8px;
+        }
+
+        .spinner.show {
+            display: inline-block;
+        }
+
+        /* Password Requirements */
+        .password-requirements {
+            font-size: 0.85rem;
+            margin-top: 8px;
+            color: #666;
+        }
+
+        .requirement {
+            display: flex;
+            align-items: center;
+            margin: 4px 0;
+        }
+
+        .requirement i {
+            margin-right: 6px;
+            font-size: 0.75rem;
+        }
+
+        .requirement.met {
+            color: var(--secondary-color);
+        }
+
+        .requirement.unmet {
+            color: #999;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 30px;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .card-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .card-body {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="card">
+            <div class="card-header">
+                <h1><i class="fas fa-link"></i> URL Shortener</h1>
+                <p>Professional Link Management</p>
+            </div>
+
+            <div class="card-body">
+                <!-- Alert Container -->
+                <div id="alert-container"></div>
+
+                <!-- LOGIN FORM -->
+                <div id="loginSection" class="form-section active">
+                    <h5 style="margin-bottom: 25px; color: var(--dark-color); font-weight: 700;">
+                        <i class="fas fa-sign-in-alt"></i> Sign In to Your Account
+                    </h5>
+
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label for="loginUsername">
+                                <i class="fas fa-user"></i> Username
+                            </label>
+                            <input 
+                                type="text" 
+                                class="form-control" 
+                                id="loginUsername" 
+                                placeholder="Enter your username"
+                                required
+                                autocomplete="username"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="loginPassword">
+                                <i class="fas fa-lock"></i> Password
+                            </label>
+                            <input 
+                                type="password" 
+                                class="form-control" 
+                                id="loginPassword" 
+                                placeholder="Enter your password"
+                                required
+                                autocomplete="current-password"
+                            >
+                        </div>
+
+                        <button type="submit" class="btn-submit">
+                            <span class="spinner" id="loginSpinner">
+                                <i class="fas fa-spinner fa-spin"></i>
+                            </span>
+                            <span id="loginBtnText">Sign In</span>
+                        </button>
+                    </form>
+
+                    <div class="toggle-section">
+                        <p>Don't have an account? <a class="toggle-link" onclick="toggleSection()">Create one</a></p>
+                    </div>
+                </div>
+
+                <!-- SIGNUP FORM -->
+                <div id="signupSection" class="form-section">
+                    <h5 style="margin-bottom: 25px; color: var(--dark-color); font-weight: 700;">
+                        <i class="fas fa-user-plus"></i> Create New Account
+                    </h5>
+
+                    <form id="signupForm">
+                        <div class="form-group">
+                            <label for="signupUsername">
+                                <i class="fas fa-user"></i> Username
+                            </label>
+                            <input 
+                                type="text" 
+                                class="form-control" 
+                                id="signupUsername" 
+                                placeholder="Choose a username (5-9 characters)"
+                                required
+                                autocomplete="username"
+                            >
+                            <small class="d-block mt-2" style="color: #666;">
+                                <i class="fas fa-info-circle"></i> Must be 5-9 characters, alphanumeric only
+                            </small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="signupPassword">
+                                <i class="fas fa-lock"></i> Password
+                            </label>
+                            <input 
+                                type="password" 
+                                class="form-control" 
+                                id="signupPassword" 
+                                placeholder="Create a strong password"
+                                required
+                                autocomplete="new-password"
+                            >
+                            <div class="password-requirements" id="passwordRequirements">
+                                <div class="requirement unmet" id="lenReq">
+                                    <i class="fas fa-circle"></i> At least 6 characters
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="confirmPassword">
+                                <i class="fas fa-lock"></i> Confirm Password
+                            </label>
+                            <input 
+                                type="password" 
+                                class="form-control" 
+                                id="confirmPassword" 
+                                placeholder="Re-enter your password"
+                                required
+                                autocomplete="new-password"
+                            >
+                        </div>
+
+                        <button type="submit" class="btn-submit">
+                            <span class="spinner" id="signupSpinner">
+                                <i class="fas fa-spinner fa-spin"></i>
+                            </span>
+                            <span id="signupBtnText">Create Account</span>
+                        </button>
+                    </form>
+
+                    <div class="toggle-section">
+                        <p>Already have an account? <a class="toggle-link" onclick="toggleSection()">Sign in</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <p>&copy; 2026 URL Shortener. Made with <i class="fas fa-heart" style="color: var(--danger-color);"></i> for You</p>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const loginForm = document.getElementById('loginForm');
+        const signupForm = document.getElementById('signupForm');
+        const loginSection = document.getElementById('loginSection');
+        const signupSection = document.getElementById('signupSection');
+        const loginUsername = document.getElementById('loginUsername');
+        const loginPassword = document.getElementById('loginPassword');
+        const signupUsername = document.getElementById('signupUsername');
+        const signupPassword = document.getElementById('signupPassword');
+        const confirmPassword = document.getElementById('confirmPassword');
+        const alertContainer = document.getElementById('alert-container');
+
+        // Password requirements checker
+        signupPassword.addEventListener('input', function() {
+            const lenReq = document.getElementById('lenReq');
+            
+            if (this.value.length >= 6) {
+                lenReq.classList.remove('unmet');
+                lenReq.classList.add('met');
+                lenReq.innerHTML = '<i class="fas fa-check-circle"></i> At least 6 characters';
+            } else {
+                lenReq.classList.remove('met');
+                lenReq.classList.add('unmet');
+                lenReq.innerHTML = '<i class="fas fa-circle"></i> At least 6 characters';
+            }
+        });
+
+        // Toggle between login and signup
+        function toggleSection() {
+            loginSection.classList.toggle('active');
+            signupSection.classList.toggle('active');
+            clearAllInputs();
+            alertContainer.innerHTML = '';
+        }
+
+        // Clear all form inputs
+        function clearAllInputs() {
+            loginForm.reset();
+            signupForm.reset();
+        }
+
+        // Login form submission
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const username = loginUsername.value.trim();
+            const password = loginPassword.value.trim();
+
+            if (!username || !password) {
+                showAlert('Please fill in all fields', 'danger');
+                return;
+            }
+
+            const loginSpinner = document.getElementById('loginSpinner');
+            const loginBtnText = document.getElementById('loginBtnText');
+            loginSpinner.classList.add('show');
+            loginBtnText.textContent = 'Signing in...';
+
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                loginSpinner.classList.remove('show');
+                loginBtnText.textContent = 'Sign In';
+
+                if (!response.ok) {
+                    showAlert(data.error || 'Login failed', 'danger');
+                    return;
+                }
+
+                showAlert(data.message, 'success');
+                setTimeout(() => {
+                    window.location.href = '/dashboard';
+                }, 1500);
+
+            } catch (error) {
+                loginSpinner.classList.remove('show');
+                loginBtnText.textContent = 'Sign In';
+                showAlert('Network error. Please try again.', 'danger');
+                console.error('Error:', error);
+            }
+        });
+
+        // Signup form submission
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const username = signupUsername.value.trim();
+            const password = signupPassword.value.trim();
+            const confirmPwd = confirmPassword.value.trim();
+
+            if (!username || !password || !confirmPwd) {
+                showAlert('Please fill in all fields', 'danger');
+                return;
+            }
+
+            if (username.length < 5 || username.length > 9) {
+                showAlert('Username must be between 5 to 9 characters long', 'danger');
+                return;
+            }
+
+            if (password.length < 6) {
+                showAlert('Password must be at least 6 characters long', 'danger');
+                return;
+            }
+
+            if (password !== confirmPwd) {
+                showAlert('Passwords do not match', 'danger');
+                return;
+            }
+
+            const signupSpinner = document.getElementById('signupSpinner');
+            const signupBtnText = document.getElementById('signupBtnText');
+            signupSpinner.classList.add('show');
+            signupBtnText.textContent = 'Creating...';
+
+            try {
+                const response = await fetch('/api/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password, confirm_password: confirmPwd })
+                });
+
+                const data = await response.json();
+
+                signupSpinner.classList.remove('show');
+                signupBtnText.textContent = 'Create Account';
+
+                if (!response.ok) {
+                    showAlert(data.error || 'Signup failed', 'danger');
+                    return;
+                }
+
+                showAlert(data.message, 'success');
+                setTimeout(() => {
+                    toggleSection();
+                    loginForm.reset();
+                    loginUsername.focus();
+                }, 1500);
+
+            } catch (error) {
+                signupSpinner.classList.remove('show');
+                signupBtnText.textContent = 'Create Account';
+                showAlert('Network error. Please try again.', 'danger');
+                console.error('Error:', error);
+            }
+        });
+
+        // Show alert function
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+            alertDiv.role = 'alert';
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+
+            alertContainer.innerHTML = '';
+            alertContainer.appendChild(alertDiv);
+
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
